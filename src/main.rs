@@ -66,17 +66,14 @@ mod dsp;
 #[global_allocator]
 static ALLOCATOR: CortexMHeap = CortexMHeap::empty();
 
-// static mut SHARED_DEVICE_1:
-// Option<MyDevice<shared_bus::I2cProxy<shared_bus::CortexMMutex<SomeI2cBus>>>>
-// = None;
 static mut SHARED_DEVICE_1:
 Option<HT16K33<I2cProxy<'_, Mutex<RefCell<daisy_bsp::hal::i2c::I2c<I2C1>>>>>>
 = None;
 static mut SHARED_DEVICE_2:
-Option<I2c<shared_bus::I2cProxy<shared_bus::CortexMMutex<I2C1>>>>
+Option<HT16K33<I2cProxy<'_, Mutex<RefCell<daisy_bsp::hal::i2c::I2c<I2C1>>>>>>
 = None;
 static mut SHARED_DEVICE_3:
-Option<I2c<shared_bus::I2cProxy<shared_bus::CortexMMutex<I2C1>>>>
+Option<HT16K33<I2cProxy<'_, Mutex<RefCell<daisy_bsp::hal::i2c::I2c<I2C1>>>>>>
 = None;
 
 #[alloc_error_handler]
@@ -153,27 +150,20 @@ fn main() -> ! {
 
 
 
-    // Create a mock I2C device.
-    // let mut i2cmock = I2cMock::new();
-    // let mut ht16k33 = HT16K33::new(i2cmock, 0x71);
-
     let i2c1_bus: &'static _ = shared_bus::new_cortexm!(hal::i2c::I2c<daisy_bsp::pac::I2C1> =  i2c1).unwrap();
     let d1b = i2c1_bus.acquire_i2c();
-    // let d2b = i2c1_bus.acquire_i2c();
-    // let d3b = i2c1_bus.acquire_i2c();
+    let d2b = i2c1_bus.acquire_i2c();
+    let d3b = i2c1_bus.acquire_i2c();
     let mut display_1 = HT16K33::new(d1b, 0x70);
-    // let mut display_2 = HT16K33::new(d1b, 0x70);
-    // let mut display_3 = HT16K33::new(d1b, 0x70);
+    let mut display_2 = HT16K33::new(d2b, 0x71);
+    let mut display_3 = HT16K33::new(d3b, 0x72);
     unsafe {
         SHARED_DEVICE_1 = Some(display_1);
-        // SHARED_DEVICE_2 = Some(display_2);
-        // SHARED_DEVICE_3 = Some(display_3);
+        SHARED_DEVICE_2 = Some(display_2);
+        SHARED_DEVICE_3 = Some(display_3);
     }
 
-    // let combined_display = DisplayDriver::init_display(&i2c1);
     let mut combined_display = DisplayDriver::init_display();
-    // let combined_display = DisplayDriver::init_display(d1b,d2b,d3b);
-    // let combined_display = DisplayDriver::init_display(i2c1_bus);
 
     // let audio_interface = audio::Interface::init(&ccdr.clocks,
     //                                              sai1_prec,
@@ -241,22 +231,6 @@ fn main() -> ! {
         led_user.off();
         asm::delay(one_second);
         combined_display.display_numbers_frame();
-        // display_1.update_buffer_with_digit(Index::One, ((ctr + 0) % 10) as u8);
-        // display_1.update_buffer_with_digit(Index::Two, ((ctr + 1) % 10) as u8);
-        // display_1.update_buffer_with_digit(Index::Three, ((ctr + 2) % 10) as u8);
-        // display_1.update_buffer_with_digit(Index::Four, ((ctr + 3) % 10) as u8);
-        // display_1.write_display_buffer().unwrap();
-        // display_2.update_buffer_with_digit(Index::One, ((ctr + 4) % 10) as u8);
-        // display_2.update_buffer_with_digit(Index::Two, ((ctr + 5) % 10) as u8);
-        // display_2.update_buffer_with_digit(Index::Three, ((ctr + 6) % 10) as u8);
-        // display_2.update_buffer_with_digit(Index::Four, ((ctr + 7) % 10) as u8);
-        // display_2.write_display_buffer().unwrap();
-        // display_3.update_buffer_with_digit(Index::One, ((ctr + 8) % 10) as u8);
-        // display_3.update_buffer_with_digit(Index::Two, ((ctr + 9) % 10) as u8);
-        // display_3.update_buffer_with_digit(Index::Three, ((ctr + 10) % 10) as u8);
-        // display_3.update_buffer_with_digit(Index::Four, ((ctr + 11) % 10) as u8);
-        // display_3.write_display_buffer().unwrap();
-        // loggit!("{}", ctr);
     }
 }
 
