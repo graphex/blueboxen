@@ -6,8 +6,8 @@ extern crate alloc;
 
 use core::alloc::Layout;
 
-// use panic_semihosting as _;
-use panic_halt as _;
+use panic_semihosting as _;
+// use panic_halt as _;
 use cortex_m_rt::entry;
 
 use daisy_bsp as daisy;
@@ -55,14 +55,15 @@ use crate::i2c::I2c;
 use crate::stm32::{I2C1, Peripherals};
 use crate::hal::gpio::Output;
 use crate::display_driver::*;
-use dsp::osc;
 
 mod display_driver;
 mod dsp;
+use dsp::osc;
 
 // - static global state ------------------------------------------------------
 
 // static AUDIO_INTERFACE: Mutex<RefCell<Option<audio::Interface>>> = Mutex::new(RefCell::new(None));
+
 #[global_allocator]
 static ALLOCATOR: CortexMHeap = CortexMHeap::empty();
 
@@ -134,7 +135,12 @@ fn main() -> ! {
     //             pins.AK4556.SD_A.into_alternate_af6(),
     //             pins.AK4556.SD_B.into_alternate_af6());
     //
+    // loggit!("Setting up audio");
     // let sai1_prec = ccdr.peripheral.SAI1.kernel_clk_mux(hal::rcc::rec::Sai1ClkSel::PLL3_P);
+    // let audio_interface = audio::Interface::init(&ccdr.clocks,
+    //                                              sai1_prec,
+    //                                              audio_pins,
+    //                                              ccdr.peripheral.DMA1).unwrap();
 
     //setup i2c1 bus for shared use
     loggit!("Setting up i2c");
@@ -162,16 +168,14 @@ fn main() -> ! {
         SHARED_DEVICE_2 = Some(display_2);
         SHARED_DEVICE_3 = Some(display_3);
     }
+    loggit!("Set up i2c");
 
     let mut combined_display = DisplayDriver::init_display();
 
-    // let audio_interface = audio::Interface::init(&ccdr.clocks,
-    //                                              sai1_prec,
-    //                                              audio_pins,
-    //                                              ccdr.peripheral.DMA1).unwrap();
 
 
-    // // - audio callback -------------------------------------------------------
+    // // // - audio callback -------------------------------------------------------
+    // loggit!("Setting up callback");
     //
     // // handle callback with function pointer
     // #[cfg(not(feature = "alloc"))]
@@ -187,8 +191,7 @@ fn main() -> ! {
     //         }
     //     }
     //
-    //     // audio_interface.spawn(callback)
-    //     // audio_interface.start(callback)
+    //     audio_interface.spawn(callback)
     // };
     //
     // // handle callback with closure (needs alloc)
@@ -205,7 +208,7 @@ fn main() -> ! {
     //         }
     //     })
     // };
-
+    //
     // let audio_interface = match audio_interface {
     //     Ok(audio_interface) => audio_interface,
     //     Err(e) => {
@@ -213,7 +216,7 @@ fn main() -> ! {
     //         loop {}
     //     }
     // };
-
+    //
     // cortex_m::interrupt::free(|cs| {
     //     AUDIO_INTERFACE.borrow(cs).replace(Some(audio_interface));
     // });
@@ -230,7 +233,8 @@ fn main() -> ! {
         asm::delay(one_second);
         led_user.off();
         asm::delay(one_second);
-        combined_display.display_numbers_frame();
+        // combined_display.display_numbers_frame();
+        combined_display.hello_world();
     }
 }
 

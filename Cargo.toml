@@ -13,7 +13,7 @@ alloc-cortex-m = "0.4.2"
 cortex-m-semihosting = "0.3.7"
 #daisy_bsp = { version = "0.4.1", features = ["seed", "alloc"]  }
 #daisy_bsp = { git = "https://github.com/antoinevg/daisy_bsp.git", features = ["seed", "without-alloc"] }
-daisy_bsp = { git = "https://github.com/antoinevg/daisy_bsp.git", features = ["seed"] }
+daisy_bsp = { git = "https://github.com/antoinevg/daisy_bsp.git", rev = "209d938b58d2ffe0e05af96103c17aa5a0cc0391", features = ["seed"] }
 shared-bus = { version = "0.2.2", features = ["cortex-m"] }
 adafruit-alphanum4 = { version = "0.1.2", default-features = false }
 ht16k33 = { version = "0.4.0", default-features = false }

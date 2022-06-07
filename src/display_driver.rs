@@ -27,7 +27,7 @@ use crate::stm32::{I2C1, Peripherals};
 use crate::hal::gpio::Output;
 use crate::{Mutex, SHARED_DEVICE_1, SHARED_DEVICE_2, SHARED_DEVICE_3};
 
-
+const BUFFER_SIZE:usize = 128;
 pub struct DisplayDriver<'a> {
     display_1: &'a mut HT16K33<I2cProxy<'a, Mutex<RefCell<daisy_bsp::hal::i2c::I2c<I2C1>>>>>,
     display_2: &'a mut HT16K33<I2cProxy<'a, Mutex<RefCell<daisy_bsp::hal::i2c::I2c<I2C1>>>>>,
@@ -40,12 +40,17 @@ where
 {
     pub fn init_display() -> Self
     {
+
         let display_1 = unsafe {SHARED_DEVICE_1.as_mut().unwrap()};
         let display_2 = unsafe {SHARED_DEVICE_2.as_mut().unwrap()};
         let display_3 = unsafe {SHARED_DEVICE_3.as_mut().unwrap()};
-        let brightness = Dimming::BRIGHTNESS_1_16;
+        let brightness = Dimming::BRIGHTNESS_3_16;
+        loggit!("Setting Up Displays");
 
-        display_1.initialize().expect("Failed to initialize ht16k33");
+        match display_1.initialize() {
+            Ok(()) => (),
+            Err(error) => loggit!("Error initializing display 1")
+        };
         display_1.set_display(Display::ON).expect("Could not turn on the display!");
         display_1.set_dimming(brightness).expect("Could not set brightness");
         display_1.write_display_buffer().unwrap();
@@ -85,6 +90,35 @@ where
         self.display_3.update_buffer_with_digit(Index::Three, ((self.counter + 10) % 10) as u8);
         self.display_3.update_buffer_with_digit(Index::Four, ((self.counter + 11) % 10) as u8);
         self.display_3.write_display_buffer().unwrap();
+        loggit!("{}", self.counter);
+    }
+    pub fn hello_world(&mut self) {
+        self.counter += 1;
+        self.display_1.update_buffer_with_char(Index::One,   AsciiChar::from_ascii('h').unwrap());
+        self.display_1.update_buffer_with_char(Index::Two,   AsciiChar::from_ascii('e').unwrap());
+        self.display_1.update_buffer_with_char(Index::Three, AsciiChar::from_ascii('l').unwrap());
+        self.display_1.update_buffer_with_char(Index::Four,  AsciiChar::from_ascii('l').unwrap());
+        self.display_2.update_buffer_with_char(Index::One,   AsciiChar::from_ascii('o').unwrap());
+        self.display_2.update_buffer_with_char(Index::Two,   AsciiChar::from_ascii(' ').unwrap());
+        self.display_2.update_buffer_with_char(Index::Three, AsciiChar::from_ascii('w').unwrap());
+        self.display_2.update_buffer_with_char(Index::Four,  AsciiChar::from_ascii('o').unwrap());
+        self.display_3.update_buffer_with_char(Index::One,   AsciiChar::from_ascii('r').unwrap());
+        self.display_3.update_buffer_with_char(Index::Two,   AsciiChar::from_ascii('l').unwrap());
+        self.display_3.update_buffer_with_char(Index::Three, AsciiChar::from_ascii('d').unwrap());
+        self.display_3.update_buffer_with_char(Index::Four,  AsciiChar::from_ascii(((self.counter) % 128) as u8).unwrap());
+
+        match self.display_1.write_display_buffer() {
+            Ok(()) => (),
+            Err(error) => loggit!("Error updating display 1")
+        };
+        match self.display_2.write_display_buffer() {
+            Ok(()) => (),
+            Err(error) => loggit!("Error updating display 2")
+        };
+        match self.display_3.write_display_buffer() {
+            Ok(()) => (),
+            Err(error) => loggit!("Error updating display 3")
+        };
         loggit!("{}", self.counter);
     }
 }
