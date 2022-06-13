@@ -15,7 +15,7 @@ use hal::delay::Delay;
 use hal::i2c;
 use hal::stm32;
 use daisy::embedded_hal::blocking::i2c::*;
-use crate::hal::rcc::rec::I2c1;
+use crate::hal::rcc::rec::I2c4;
 
 use adafruit_alphanum4::*;
 use ht16k33::{Dimming, Display, HT16K33};
@@ -23,15 +23,15 @@ use shared_bus::{BusManager, BusMutex, CortexMMutex, I2cProxy, NullMutex};
 
 use crate::hal::rcc::Ccdr;
 use crate::i2c::I2c;
-use crate::stm32::{I2C1, Peripherals};
+use crate::stm32::{I2C4, Peripherals};
 use crate::hal::gpio::Output;
 use crate::{Mutex, SHARED_DEVICE_1, SHARED_DEVICE_2, SHARED_DEVICE_3};
 
 const BUFFER_SIZE:usize = 128;
 pub struct DisplayDriver<'a> {
-    display_1: &'a mut HT16K33<I2cProxy<'a, Mutex<RefCell<daisy_bsp::hal::i2c::I2c<I2C1>>>>>,
-    display_2: &'a mut HT16K33<I2cProxy<'a, Mutex<RefCell<daisy_bsp::hal::i2c::I2c<I2C1>>>>>,
-    display_3: &'a mut HT16K33<I2cProxy<'a, Mutex<RefCell<daisy_bsp::hal::i2c::I2c<I2C1>>>>>,
+    display_1: &'a mut HT16K33<I2cProxy<'a, Mutex<RefCell<daisy_bsp::hal::i2c::I2c<I2C4>>>>>,
+    display_2: &'a mut HT16K33<I2cProxy<'a, Mutex<RefCell<daisy_bsp::hal::i2c::I2c<I2C4>>>>>,
+    display_3: &'a mut HT16K33<I2cProxy<'a, Mutex<RefCell<daisy_bsp::hal::i2c::I2c<I2C4>>>>>,
     counter: u32,
 }
 
